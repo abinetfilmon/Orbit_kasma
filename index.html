@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Orbit × Kasma — 7-Week Post Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Plus Jakarta Sans','Segoe UI',sans-serif;background:#070b12;color:#dde8f8;font-size:14px;}
+    ::-webkit-scrollbar{width:5px;height:5px;}
+    ::-webkit-scrollbar-thumb{background:#1e2c40;border-radius:3px;}
+
+    /* Layout */
+    #root{min-height:100vh;}
+    .header{background:#0c1120;border-bottom:1px solid #192030;padding:0 18px;position:sticky;top:0;z-index:100;}
+    .header-inner{max-width:1320px;margin:0 auto;height:54px;display:flex;align-items:center;gap:12px;}
+    .logo-box{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:17px;}
+    .logo-name{font-weight:800;font-size:13px;letter-spacing:-.4px;}
+    .logo-sub{font-size:10px;color:#4a5e7a;font-family:monospace;letter-spacing:.3px;}
+    .nav-area{display:flex;gap:2px;margin-left:14px;}
+    .nav-btn{padding:6px 13px;border-radius:7px;border:none;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;font-family:inherit;}
+    .nav-btn.active{background:#3b82f6;color:white;}
+    .nav-btn:not(.active){background:none;color:#4a5e7a;}
+    .header-right{margin-left:auto;display:flex;gap:7px;align-items:center;}
+    .project-pill{display:flex;align-items:center;gap:7px;padding:4px 11px;border-radius:20px;background:#0e1828;border:1px solid #192030;}
+    .green-dot{width:6px;height:6px;border-radius:99px;background:#22c55e;box-shadow:0 0 6px #22c55e;}
+    .icon-btn{width:30px;height:30px;border-radius:7px;border:1px solid #192030;background:#0e1828;cursor:pointer;font-size:14px;}
+
+    /* Banner */
+    .banner{background:linear-gradient(135deg,#090f1e,#06101c);border-bottom:1px solid #192030;padding:14px 18px;}
+    .banner-inner{max-width:1320px;margin:0 auto;}
+    .banner-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;font-size:11px;}
+    .banner-lead{font-weight:800;letter-spacing:.8px;color:#3b82f6;text-transform:uppercase;}
+    .banner-dot{color:#1e2c40;}
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:8px;margin-bottom:12px;}
+    .stat-card{background:#101624;border-radius:10px;padding:10px 12px;border:1px solid #192030;}
+    .stat-icon{font-size:16px;margin-bottom:3px;}
+    .stat-val{font-family:monospace;font-size:18px;font-weight:700;line-height:1;}
+    .stat-label{font-size:10px;color:#4a5e7a;margin-top:3px;}
+
+    /* Progress bar */
+    .bar-wrap{border-radius:99px;background:#1e2c40;overflow:hidden;}
+    .bar-fill{border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1);}
+
+    /* Content */
+    .content{max-width:1320px;margin:0 auto;padding:18px 16px;}
+
+    /* Week pills */
+    .week-pills{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;}
+    .week-pill{cursor:pointer;border-radius:12px;font-size:12px;font-weight:700;border:none;transition:all .18s;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 14px;font-family:inherit;}
+    .week-pill.active{background:#3b82f6;color:white;box-shadow:0 0 18px #3b82f645;}
+    .week-pill:not(.active){background:#101624;color:#4a5e7a;border:1.5px solid #1e2c40;}
+    .week-pill .wp-num{font-size:13px;}
+    .week-pill .wp-date{font-size:9px;opacity:.75;font-family:monospace;font-weight:400;}
+    .week-pill .wp-pct{font-size:11px;font-family:monospace;}
+
+    /* Cards */
+    .card{background:#101624;border-radius:12px;border:1px solid #192030;margin-bottom:12px;}
+    .card-pad{padding:12px 16px;}
+    .card-title{font-weight:800;font-size:15px;}
+
+    /* Week summary */
+    .week-summary{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+    .week-stat{text-align:center;min-width:52px;}
+    .week-stat-val{font-family:monospace;font-size:17px;font-weight:700;line-height:1;}
+    .week-stat-label{font-size:10px;color:#4a5e7a;margin-top:2px;}
+
+    /* Controls bar */
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 14px;}
+    .search-input{flex:1;min-width:140px;padding:7px 11px;border-radius:8px;border:1.5px solid #192030;background:#0e1828;color:#dde8f8;font-size:13px;font-family:inherit;}
+    .search-input:focus{border-color:#3b82f6;outline:none;}
+    .chip{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #1e2c40;background:none;color:#4a5e7a;font-family:inherit;transition:all .15s;}
+    .chip.on{background:#3b82f6;color:white;border-color:#3b82f6;}
+    .act-btn{padding:7px 13px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #1e2c40;background:none;color:#4a5e7a;font-family:inherit;transition:all .15s;}
+    .act-btn:hover{border-color:#3b82f6;color:#3b82f6;}
+    .add-btn{padding:7px 13px;border-radius:8px;background:#3b82f6;color:white;border:none;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;}
+    .btn-row{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap;}
+
+    /* Table */
+    .tbl-wrap{overflow-x:auto;}
+    table{width:100%;border-collapse:collapse;min-width:660px;}
+    thead tr{background:#0e1828;border-bottom:1px solid #192030;}
+    th{padding:9px 10px;font-size:10px;font-weight:700;color:#4a5e7a;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap;}
+    th.left,td.left{text-align:left;}
+    th.center,td.center{text-align:center;}
+    tbody tr{border-bottom:1px solid #192030;transition:background .12s;}
+    tbody tr:hover{background:#0e1928;}
+    td{padding:10px 10px;}
+    .tbl-num{font-size:11px;color:#4a5e7a;font-family:monospace;width:34px;}
+    .ent-avatar{width:28px;height:28px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;}
+    .ent-name{font-size:13px;font-weight:600;}
+    .ent-proj{font-size:10px;color:#4a5e7a;font-family:monospace;}
+    .toggle-btn{width:36px;height:36px;border-radius:9px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;margin:0 auto;transition:all .15s;border:2px solid;outline:none;}
+    .toggle-btn.on{border-color:#22c55e;background:#052e16;}
+    .toggle-btn.off{border-color:#1e2c40;background:#0e1828;}
+    .toggle-btn:hover{transform:scale(1.1);}
+    .toggle-btn:active{transform:scale(.9);}
+    .progress-col{min-width:90px;}
+    .pct-badge{font-family:monospace;font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;white-space:nowrap;}
+    .ico-btn{cursor:pointer;opacity:.4;background:none;border:none;font-size:13px;padding:3px;transition:opacity .15s;}
+    .ico-btn:hover{opacity:1;}
+    .tbl-footer{padding:8px 14px;border-top:1px solid #192030;display:flex;justify-content:space-between;font-size:11px;color:#4a5e7a;}
+
+    /* Modal */
+    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:400;padding:16px;}
+    .modal{background:#101624;border-radius:20px;padding:28px;width:100%;max-width:440px;border:1px solid #1e2c40;max-height:90vh;overflow-y:auto;}
+    .modal-title{font-weight:800;font-size:17px;margin-bottom:4px;}
+    .modal-sub{font-size:11px;color:#4a5e7a;margin-bottom:20px;}
+    .divider{height:1px;background:#192030;margin-bottom:20px;}
+    .field-label{font-size:11px;font-weight:700;color:#4a5e7a;letter-spacing:.5px;text-transform:uppercase;display:block;margin-bottom:6px;}
+    .field-input{width:100%;padding:10px 13px;border-radius:9px;border:1.5px solid #1e2c40;background:#0e1828;color:#dde8f8;font-size:13px;font-family:inherit;margin-bottom:14px;}
+    .field-input:focus{border-color:#3b82f6;outline:none;}
+    .week-preview{border-radius:9px;border:1px solid #192030;overflow:hidden;margin-top:10px;}
+    .week-preview-header{padding:8px 12px;background:#0e1828;font-size:10px;font-weight:700;color:#4a5e7a;letter-spacing:.5px;text-transform:uppercase;}
+    .week-preview-row{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;border-top:1px solid #192030;}
+    .week-preview-row:nth-child(even){background:#0e1828;}
+    .save-btn{width:100%;padding:12px;border-radius:10px;background:#3b82f6;color:white;border:none;cursor:pointer;font-weight:800;font-size:14px;font-family:inherit;}
+    .save-btn:disabled{background:#1e2c40;color:#4a5e7a;cursor:not-allowed;}
+    .cancel-btn{width:100%;margin-top:8px;padding:10px;border-radius:10px;background:none;color:#4a5e7a;border:1px solid #192030;cursor:pointer;font-size:13px;font-family:inherit;}
+
+    /* Overview grid */
+    .ov-cell{width:56px;height:30px;margin:0 auto;display:flex;align-items:center;justify-content:center;border-radius:7px;cursor:pointer;}
+
+    /* Analytics */
+    .platform-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px;}
+    .platform-card{background:#0e1828;border-radius:10px;padding:16px;border:1px solid #192030;}
+    .bar-chart{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;}
+    .bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+    .bar-track{width:100%;height:90px;background:#0e1828;border-radius:7px;position:relative;overflow:hidden;}
+    .bar-fill-abs{position:absolute;bottom:0;width:100%;border-radius:5px 5px 0 0;transition:height .6s cubic-bezier(.4,0,.2,1);}
+    .bar-active-border{position:absolute;inset:0;border:2px solid #3b82f6;border-radius:7px;pointer-events:none;}
+    .lb-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+    .lb-rank{width:22px;font-size:11px;color:#4a5e7a;font-family:monospace;text-align:right;flex-shrink:0;font-weight:700;}
+    .lb-avatar{width:26px;height:26px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;}
+
+    /* Toast */
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2235;color:white;padding:10px 20px;border-radius:10px;font-size:13px;z-index:999;box-shadow:0 4px 24px rgba(0,0,0,.4);white-space:nowrap;animation:fadeUp .3s ease;}
+    @keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(14px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+    /* Edit input in table */
+    .edit-input{padding:4px 8px;border-radius:6px;border:1.5px solid #3b82f6;background:#0e1828;color:#dde8f8;font-size:13px;width:100%;font-family:inherit;}
+
+    @media(max-width:680px){.hide-sm{display:none!important;}}
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const TOTAL_WEEKS = 7;
+const PLATFORMS = ["tiktok","facebook","telegram"];
+const PM = {
+  tiktok:   {label:"TikTok",   icon:"🎵", color:"#00c8c8"},
+  facebook: {label:"Facebook", icon:"📘", color:"#1877f2"},
+  telegram: {label:"Telegram", icon:"✈️", color:"#29b6f6"},
+};
+const DEFAULT_ENT = [
+  "Acme Holdings","Bluewave Finance","Crest Logistics","Delta Retail Group",
+  "Emerald Properties","Falcon Industries","Greenfield Energy","Horizon Pharmaceuticals",
+  "Ironclad Security","Jade Manufacturing","Keystone Construction","Lighthouse Media",
+  "Momentum Automotive","Nexus Healthcare","Orbit Tech Solutions","Pinnacle Foods",
+  "Quantum Engineering","Redwood Capital","Skybridge Aviation","TerraFirm Agriculture",
+  "Unity Telecom","Vanguard Insurance","Westgate Tourism","Xcellerate Education",
+  "Zenith Consulting",
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const KEY = "orbit_kasma_v4";
+function loadState() {
+  try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; } catch { return null; }
+}
+function saveState(s) {
+  try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {}
+}
+
+let STATE = loadState() || {
+  enterprises: DEFAULT_ENT.map((name,i) => ({id:`e${i}`,name})),
+  posts: {},
+  startDate: "",
+  projectName: "Orbit Innovation Hub",
+  consultantName: "Kasma Digitals",
+};
+let activeWeek = 1;
+let currentView = "tracker";
+let search = "";
+let showIncomplete = false;
+let platformFilter = "all";
+let editingId = null;
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function pk(eid, week, platform) { return `${eid}_w${week}_${platform}`; }
+function pct(a, b) { return b === 0 ? 0 : Math.round((a/b)*100); }
+
+function weekRange(startDate, w) {
+  if (!startDate) return null;
+  const s = new Date(startDate);
+  s.setDate(s.getDate() + (w-1)*7);
+  const e = new Date(s); e.setDate(s.getDate()+6);
+  const f = d => d.toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+  return `${f(s)} – ${f(e)}`;
+}
+
+function guessWeek(startDate) {
+  if (!startDate) return 1;
+  const diff = Math.floor((new Date() - new Date(startDate)) / (7*24*60*60*1000));
+  return Math.min(Math.max(diff+1,1), TOTAL_WEEKS);
+}
+
+function getStatus(eid, week, pl) { return !!STATE.posts[pk(eid,week,pl)]; }
+
+function ewStats(eid, week) {
+  const posted = PLATFORMS.filter(p => getStatus(eid,week,p)).length;
+  return {posted, remaining:3-posted, pct:pct(posted,3)};
+}
+
+function eTotalStats(eid) {
+  const total = TOTAL_WEEKS*3;
+  const posted = Array.from({length:TOTAL_WEEKS},(_,i)=>i+1)
+    .reduce((acc,w) => acc + PLATFORMS.filter(p=>getStatus(eid,w,p)).length, 0);
+  return {posted, remaining:total-posted, pct:pct(posted,total)};
+}
+
+function weekTotals(week) {
+  const total = STATE.enterprises.length*3;
+  const posted = STATE.enterprises.reduce((acc,e) => acc+ewStats(e.id,week).posted, 0);
+  return {total, posted, remaining:total-posted, pct:pct(posted,total)};
+}
+
+function projectStats() {
+  const total = STATE.enterprises.length*TOTAL_WEEKS*3;
+  const posted = STATE.enterprises.reduce((acc,e) =>
+    acc + Array.from({length:TOTAL_WEEKS},(_,i)=>i+1)
+      .reduce((a,w) => a+PLATFORMS.filter(p=>getStatus(e.id,w,p)).length, 0), 0);
+  return {total, posted, remaining:total-posted, pct:pct(posted,total)};
+}
+
+function avatarStyle(idx) {
+  const hue = (idx*37)%360;
+  return `background:hsl(${hue},55%,22%);color:hsl(${hue},55%,65%)`;
+}
+
+function badgeStyle(v) {
+  if (v===100) return "background:#052e16;color:#22c55e";
+  if (v>=67)   return "background:#431407;color:#f59e0b";
+  if (v>0)     return "background:#0a1830;color:#3b82f6";
+  return "background:#0e1828;color:#4a5e7a";
+}
+
+function barColor(v) {
+  return v===100?"#22c55e":v>=67?"#f59e0b":"#3b82f6";
+}
+
+function getFiltered() {
+  return STATE.enterprises.filter(e => {
+    const nameMatch = e.name.toLowerCase().includes(search.toLowerCase());
+    const s = ewStats(e.id, activeWeek);
+    const incMatch = !showIncomplete || s.remaining > 0;
+    const pfMatch = platformFilter==="all" || !getStatus(e.id,activeWeek,platformFilter);
+    return nameMatch && incMatch && pfMatch;
+  });
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+let toastTimer = null;
+function showToast(msg) {
+  let t = document.getElementById("toast");
+  if (!t) { t = document.createElement("div"); t.id="toast"; t.className="toast"; document.body.appendChild(t); }
+  t.textContent = msg; t.style.display="block";
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ t.style.display="none"; }, 2800);
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render() {
+  saveState(STATE);
+  const ps = projectStats();
+  const tw = weekTotals(activeWeek);
+  const filtered = getFiltered();
+
+  document.getElementById("root").innerHTML = `
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-inner">
+        <div class="logo-box">🛰️</div>
+        <div style="margin-left:4px">
+          <div class="logo-name">${STATE.projectName||"Orbit"} <span style="color:#3b82f6">×</span> ${STATE.consultantName||"Kasma"}</div>
+          <div class="logo-sub">7-WEEK POST TRACKER</div>
+        </div>
+        <div class="nav-area">
+          <button class="nav-btn ${currentView==="tracker"?"active":""}" onclick="setView('tracker')">📋 Tracker</button>
+          <button class="nav-btn ${currentView==="overview"?"active":""}" onclick="setView('overview')">🗓 Overview</button>
+          <button class="nav-btn ${currentView==="analytics"?"active":""}" onclick="setView('analytics')">📊 Analytics</button>
+        </div>
+        <div class="header-right">
+          <div class="project-pill hide-sm">
+            <div class="green-dot"></div>
+            <span style="font-size:10px;font-weight:600;color:#4a5e7a">Project</span>
+            <span style="font-family:monospace;font-size:11px;font-weight:700;color:#3b82f6">${ps.pct}%</span>
+          </div>
+          <button class="icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
+          <button class="icon-btn" onclick="alert('Light mode coming soon!')" title="Toggle theme">☀️</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- BANNER -->
+    <div class="banner">
+      <div class="banner-inner">
+        <div class="banner-meta">
+          <span class="banner-lead">${STATE.projectName||"Orbit Innovation Hub"}</span>
+          <span class="banner-dot">·</span>
+          <span style="color:#4a5e7a">Consultant: <b style="color:#dde8f8">${STATE.consultantName||"Kasma Digitals"}</b></span>
+          ${STATE.startDate
+            ? `<span class="banner-dot">·</span><span style="font-family:monospace;color:#4a5e7a">${weekRange(STATE.startDate,1)} → ${weekRange(STATE.startDate,TOTAL_WEEKS)}</span>`
+            : `<button class="chip" onclick="openSettings()" style="color:#f59e0b;border-color:#f59e0b40">⚠️ Tap ⚙️ to set start date</button>`}
+        </div>
+        <div class="stat-grid">
+          ${[
+            {icon:"🏢",label:"Enterprises",val:STATE.enterprises.length,color:"#3b82f6"},
+            {icon:"📅",label:"Total Weeks",val:TOTAL_WEEKS,color:"#8b5cf6"},
+            {icon:"📨",label:"Total Posts",val:ps.total.toLocaleString(),color:"#4a5e7a"},
+            {icon:"✅",label:"Posted",val:ps.posted.toLocaleString(),color:"#22c55e"},
+            {icon:"⏳",label:"Remaining",val:ps.remaining.toLocaleString(),color:"#f59e0b"},
+            {icon:"📊",label:"Completion",val:`${ps.pct}%`,color:ps.pct===100?"#22c55e":"#3b82f6"},
+          ].map(s=>`
+            <div class="stat-card">
+              <div class="stat-icon">${s.icon}</div>
+              <div class="stat-val" style="color:${s.color}">${s.val}</div>
+              <div class="stat-label">${s.label}</div>
+            </div>
+          `).join("")}
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:11px">
+            <span style="color:#4a5e7a">Overall project completion</span>
+            <span style="font-family:monospace;color:#3b82f6;font-weight:700">${ps.posted.toLocaleString()} / ${ps.total.toLocaleString()} posts</span>
+          </div>
+          <div class="bar-wrap" style="height:7px">
+            <div class="bar-fill" style="height:100%;width:${ps.pct}%;background:${barColor(ps.pct)}"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+      ${currentView==="tracker" ? renderTracker(tw, filtered) : ""}
+      ${currentView==="overview" ? renderOverview() : ""}
+      ${currentView==="analytics" ? renderAnalytics() : ""}
+      <div style="margin-top:20px;text-align:center;font-size:10px;color:#4a5e7a;line-height:1.9">
+        ${STATE.projectName} × ${STATE.consultantName}<br>
+        <span style="font-family:monospace">${STATE.enterprises.length} enterprises · ${TOTAL_WEEKS} weeks · ${ps.total.toLocaleString()} total posts</span>
+      </div>
+    </div>
+  `;
+
+  // Bind inline edit if active
+  if (editingId) {
+    const inp = document.getElementById("edit-input-"+editingId);
+    if (inp) { inp.focus(); inp.select(); }
+  }
+}
+
+// ── TRACKER ───────────────────────────────────────────────────────────────────
+function renderTracker(tw, filtered) {
+  return `
+    <!-- Week pills -->
+    <div class="week-pills">
+      ${Array.from({length:TOTAL_WEEKS},(_,i)=>i+1).map(w=>{
+        const ws=weekTotals(w); const dr=weekRange(STATE.startDate,w);
+        return `<button class="week-pill ${activeWeek===w?"active":""}" onclick="setWeek(${w})">
+          <span class="wp-num">Week ${w}</span>
+          ${dr?`<span class="wp-date">${dr}</span>`:""}
+          <span class="wp-pct" style="color:${activeWeek===w?"white":barColor(ws.pct)}">${ws.pct}%</span>
+        </button>`;
+      }).join("")}
+    </div>
+
+    <!-- Week summary -->
+    <div class="card card-pad" style="margin-bottom:12px">
+      <div class="week-summary">
+        <div>
+          <div class="card-title">Week ${activeWeek}</div>
+          <div style="font-size:11px;color:#4a5e7a;font-family:monospace">${weekRange(STATE.startDate,activeWeek)||"⚙️ Set start date in Settings"}</div>
+        </div>
+        <div style="flex:1;min-width:160px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px">
+            <span style="color:#4a5e7a">Week progress</span>
+            <span style="font-family:monospace;color:#3b82f6;font-weight:700">${tw.posted}/${tw.total}</span>
+          </div>
+          <div class="bar-wrap" style="height:6px"><div class="bar-fill" style="height:100%;width:${tw.pct}%;background:${barColor(tw.pct)}"></div></div>
+        </div>
+        ${[{l:"Posted",v:tw.posted,c:"#22c55e"},{l:"Remaining",v:tw.remaining,c:"#f59e0b"},{l:"Week %",v:`${tw.pct}%`,c:"#3b82f6"}].map(s=>`
+          <div class="week-stat">
+            <div class="week-stat-val" style="color:${s.c}">${s.v}</div>
+            <div class="week-stat-label">${s.l}</div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="card controls" style="margin-bottom:12px">
+      <input class="search-input" placeholder="🔍  Search enterprise…" value="${search}" oninput="setSearch(this.value)"/>
+      <button class="chip ${showIncomplete?"on":""}" onclick="toggleIncomplete()">⚠️ Incomplete</button>
+      ${PLATFORMS.map(p=>`<button class="chip ${platformFilter===p?"on":""}" onclick="setPlatformFilter('${p}')">${PM[p].icon} ${PM[p].label}</button>`).join("")}
+      <div class="btn-row">
+        <button class="act-btn" onclick="markAll()">✅ Mark All</button>
+        <button class="act-btn" onclick="clearAll()">Clear</button>
+        <button class="act-btn" onclick="exportCSV()">⬇️ CSV</button>
+        <button class="add-btn" onclick="openAddModal()">+ Add</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th class="left">#</th><th class="left">Enterprise</th>
+            <th class="center">TikTok</th><th class="center">Facebook</th><th class="center">Telegram</th>
+            <th class="center">Progress</th><th class="center">Posted</th><th class="center">Left</th>
+            <th class="center">%</th><th class="center"></th>
+          </tr></thead>
+          <tbody>
+            ${filtered.length===0
+              ? `<tr><td colspan="10" style="text-align:center;padding:48px;color:#4a5e7a;font-size:13px">No enterprises match your filters</td></tr>`
+              : filtered.map((e,idx)=>{
+                  const s=ewStats(e.id,activeWeek); const ts=eTotalStats(e.id);
+                  const entIdx=STATE.enterprises.findIndex(x=>x.id===e.id);
+                  const isEd=editingId===e.id;
+                  return `<tr>
+                    <td class="tbl-num left">${String(idx+1).padStart(2,"0")}</td>
+                    <td class="left" style="min-width:180px">
+                      ${isEd
+                        ? `<input class="edit-input" id="edit-input-${e.id}" value="${e.name}"
+                            onkeydown="handleEditKey(event,'${e.id}')" style="width:100%"/>`
+                        : `<div style="display:flex;align-items:center;gap:8px">
+                            <div class="ent-avatar" style="${avatarStyle(entIdx)}">${e.name.charAt(0)}</div>
+                            <div>
+                              <div class="ent-name">${e.name}</div>
+                              <div class="ent-proj">Project: ${ts.pct}%</div>
+                            </div>
+                          </div>`
+                      }
+                    </td>
+                    ${PLATFORMS.map(pl=>`
+                      <td class="center">
+                        <button class="toggle-btn ${getStatus(e.id,activeWeek,pl)?"on":"off"}"
+                          onclick="togglePost('${e.id}',${activeWeek},'${pl}')">
+                          ${getStatus(e.id,activeWeek,pl)?"✅":"❌"}
+                        </button>
+                      </td>`).join("")}
+                    <td class="center progress-col">
+                      <div class="bar-wrap" style="height:5px"><div class="bar-fill" style="height:100%;width:${s.pct}%;background:${barColor(s.pct)}"></div></div>
+                      <div style="font-size:9px;color:#4a5e7a;text-align:center;margin-top:3px;font-family:monospace">week ${activeWeek}</div>
+                    </td>
+                    <td class="center" style="font-family:monospace;font-size:14px;font-weight:700;color:#22c55e">${s.posted}</td>
+                    <td class="center" style="font-family:monospace;font-size:14px;font-weight:700;color:${s.remaining>0?"#ef4444":"#4a5e7a"}">${s.remaining}</td>
+                    <td class="center"><span class="pct-badge" style="${badgeStyle(s.pct)}">${s.pct}%</span></td>
+                    <td class="center">
+                      <div style="display:flex;gap:1px;justify-content:center">
+                        ${isEd
+                          ? `<button class="ico-btn" style="color:#22c55e;opacity:1" onclick="saveEdit('${e.id}')">✓</button>
+                             <button class="ico-btn" style="color:#ef4444;opacity:1" onclick="cancelEdit()">✕</button>`
+                          : `<button class="ico-btn" onclick="startEdit('${e.id}','${e.name.replace(/'/g,"\\'")}')">✏️</button>
+                             <button class="ico-btn" onclick="deleteEnt('${e.id}')">🗑️</button>`
+                        }
+                      </div>
+                    </td>
+                  </tr>`;
+                }).join("")}
+          </tbody>
+        </table>
+      </div>
+      <div class="tbl-footer">
+        <span>${filtered.length} of ${STATE.enterprises.length} enterprises shown</span>
+        <span style="font-family:monospace">Week ${activeWeek} of ${TOTAL_WEEKS}</span>
+      </div>
+    </div>
+  `;
+}
+
+// ── OVERVIEW ──────────────────────────────────────────────────────────────────
+function renderOverview() {
+  const weeks = Array.from({length:TOTAL_WEEKS},(_,i)=>i+1);
+  return `
+    <div class="card">
+      <div style="padding:13px 18px;border-bottom:1px solid #192030;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-weight:800;font-size:15px">7-Week Grid Overview</div>
+          <div style="font-size:11px;color:#4a5e7a">All 25 enterprises × Week 1–7 · Click any cell to jump to that week</div>
+        </div>
+        <button class="act-btn" onclick="exportCSV()">⬇️ Export CSV</button>
+      </div>
+      <div class="tbl-wrap">
+        <table style="min-width:700px">
+          <thead><tr style="background:#0e1828;border-bottom:1px solid #192030">
+            <th class="left" style="position:sticky;left:0;background:#0e1828;z-index:2">Enterprise</th>
+            ${weeks.map(w=>{
+              const ws=weekTotals(w); const dr=weekRange(STATE.startDate,w);
+              return `<th class="center" style="min-width:82px;cursor:pointer;color:${activeWeek===w?"#3b82f6":"#4a5e7a"}" onclick="jumpToWeek(${w})">
+                <div>Week ${w}</div>
+                ${dr?`<div style="font-family:monospace;font-size:8px;opacity:.55;margin-top:2px;font-weight:400">${dr}</div>`:""}
+                <div style="font-family:monospace;font-size:9px;margin-top:2px;color:${barColor(ws.pct)}">${ws.pct}%</div>
+              </th>`;
+            }).join("")}
+            <th class="center">Total</th>
+          </tr></thead>
+          <tbody>
+            ${STATE.enterprises.map((e,idx)=>{
+              const ts=eTotalStats(e.id);
+              return `<tr style="border-bottom:1px solid #192030">
+                <td style="padding:9px 14px;position:sticky;left:0;background:#101624;z-index:1">
+                  <div style="display:flex;align-items:center;gap:7px">
+                    <div class="lb-avatar" style="${avatarStyle(idx)}">${e.name.charAt(0)}</div>
+                    <span style="font-size:12px;font-weight:600;white-space:nowrap">${e.name}</span>
+                  </div>
+                </td>
+                ${weeks.map(w=>{
+                  const s=ewStats(e.id,w);
+                  const bg=s.pct===100?"#052e16":s.pct>=67?"#431407":s.pct>0?"#0a1830":"#0e1828";
+                  const tx=barColor(s.pct);
+                  return `<td class="center" style="padding:8px 6px" onclick="jumpToWeek(${w})">
+                    <div class="ov-cell" style="background:${bg};cursor:pointer">
+                      <span style="font-family:monospace;font-size:11px;font-weight:700;color:${tx}">${s.pct}%</span>
+                    </div>
+                  </td>`;
+                }).join("")}
+                <td class="center" style="padding:9px 8px">
+                  <span class="pct-badge" style="${badgeStyle(ts.pct)}">${ts.pct}%</span><br>
+                  <span style="font-family:monospace;font-size:9px;color:#4a5e7a">${ts.posted}/${ts.posted+ts.remaining}</span>
+                </td>
+              </tr>`;
+            }).join("")}
+            <tr style="background:#0e1828;border-top:2px solid #192030">
+              <td style="padding:9px 14px;font-size:11px;font-weight:700;color:#4a5e7a;position:sticky;left:0;background:#0e1828">Weekly Total</td>
+              ${weeks.map(w=>{
+                const ws=weekTotals(w);
+                return `<td class="center" style="padding:9px 8px">
+                  <div style="font-family:monospace;font-size:12px;font-weight:700;color:${barColor(ws.pct)}">${ws.pct}%</div>
+                  <div style="font-size:9px;color:#4a5e7a;font-family:monospace">${ws.posted}/${ws.total}</div>
+                </td>`;
+              }).join("")}
+              <td class="center"><span style="font-family:monospace;font-size:13px;font-weight:800;color:#3b82f6">${projectStats().pct}%</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+// ── ANALYTICS ─────────────────────────────────────────────────────────────────
+function renderAnalytics() {
+  const weeks = Array.from({length:TOTAL_WEEKS},(_,i)=>i+1);
+  return `
+    <div class="card card-pad" style="margin-bottom:14px">
+      <div style="font-weight:800;margin-bottom:14px;font-size:14px">Platform Performance — Full Project</div>
+      <div class="platform-grid">
+        ${PLATFORMS.map(p=>{
+          const total=STATE.enterprises.length*TOTAL_WEEKS;
+          const posted=STATE.enterprises.reduce((acc,e)=>acc+weeks.filter(w=>getStatus(e.id,w,p)).length,0);
+          const pc=pct(posted,total);
+          return `<div class="platform-card">
+            <div style="font-size:26px;margin-bottom:6px">${PM[p].icon}</div>
+            <div style="font-weight:800;font-size:14px;margin-bottom:2px">${PM[p].label}</div>
+            <div style="font-family:monospace;font-size:28px;font-weight:700;color:${PM[p].color};line-height:1">${pc}%</div>
+            <div style="font-size:11px;color:#4a5e7a;margin:4px 0 8px">${posted} / ${total} posts</div>
+            <div class="bar-wrap" style="height:5px"><div class="bar-fill" style="height:100%;width:${pc}%;background:${PM[p].color}"></div></div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+
+    <div class="card card-pad" style="margin-bottom:14px">
+      <div style="font-weight:800;margin-bottom:14px;font-size:14px">Weekly Completion — Bar Chart</div>
+      <div class="bar-chart">
+        ${weeks.map(w=>{
+          const ws=weekTotals(w); const dr=weekRange(STATE.startDate,w);
+          const bc=barColor(ws.pct);
+          return `<div class="bar-col" onclick="jumpToWeek(${w})">
+            <span style="font-family:monospace;font-size:11px;font-weight:700;color:${bc}">${ws.pct}%</span>
+            <div class="bar-track">
+              <div class="bar-fill-abs" style="height:${Math.max(ws.pct,3)}%;background:${bc}"></div>
+              ${activeWeek===w?`<div class="bar-active-border"></div>`:""}
+            </div>
+            <span style="font-size:10px;font-weight:700;color:${activeWeek===w?"#3b82f6":"#4a5e7a"}">W${w}</span>
+            ${dr?`<span style="font-size:8px;color:#4a5e7a;font-family:monospace;text-align:center;line-height:1.4">${dr}</span>`:""}
+            <span style="font-size:9px;color:#4a5e7a;font-family:monospace">${ws.posted}/${ws.total}</span>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+
+    <div class="card card-pad">
+      <div style="font-weight:800;margin-bottom:14px;font-size:14px">Enterprise Leaderboard — Project Total</div>
+      ${[...STATE.enterprises].sort((a,b)=>eTotalStats(b.id).pct-eTotalStats(a.id).pct).map((e,i)=>{
+        const ts=eTotalStats(e.id);
+        const idx=STATE.enterprises.findIndex(x=>x.id===e.id);
+        return `<div class="lb-row">
+          <div class="lb-rank">#${i+1}</div>
+          <div class="lb-avatar" style="${avatarStyle(idx)}">${e.name.charAt(0)}</div>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:600;margin-bottom:3px">${e.name}</div>
+            <div class="bar-wrap" style="height:5px"><div class="bar-fill" style="height:100%;width:${ts.pct}%;background:${barColor(ts.pct)}"></div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0">
+            <span class="pct-badge" style="${badgeStyle(ts.pct)}">${ts.pct}%</span>
+            <span style="font-family:monospace;font-size:9px;color:#4a5e7a">${ts.posted}/${ts.posted+ts.remaining}</span>
+          </div>
+        </div>`;
+      }).join("")}
+    </div>
+  `;
+}
+
+// ── SETTINGS MODAL ────────────────────────────────────────────────────────────
+function openSettings() {
+  const existing = document.getElementById("settings-modal");
+  if (existing) existing.remove();
+  const m = document.createElement("div");
+  m.id = "settings-modal";
+  m.className = "modal-bg";
+  m.innerHTML = `
+    <div class="modal" onclick="event.stopPropagation()">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+        <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:22px">🛰️</div>
+        <div>
+          <div class="modal-title">Project Setup</div>
+          <div class="modal-sub">Configure your 7-week campaign details</div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <label class="field-label">Project Lead / Client</label>
+      <input class="field-input" id="s-project" value="${STATE.projectName}" placeholder="e.g. Orbit Innovation Hub"/>
+      <label class="field-label">Consultant Agency</label>
+      <input class="field-input" id="s-consultant" value="${STATE.consultantName}" placeholder="e.g. Kasma Digitals"/>
+      <label class="field-label">Project Start Date <span style="color:#ef4444">*</span></label>
+      <input class="field-input" id="s-date" type="date" value="${STATE.startDate}" onchange="previewWeeks()" style="font-family:monospace;margin-bottom:4px"/>
+      <div id="week-preview"></div>
+      <br/>
+      <button class="save-btn" id="save-settings-btn" onclick="saveSettings()">
+        ${STATE.startDate?"Save Changes":"Start Tracking →"}
+      </button>
+      ${STATE.startDate?`<button class="cancel-btn" onclick="closeSettings()">Cancel</button>`:""}
+    </div>
+  `;
+  m.onclick = () => { if (STATE.startDate) closeSettings(); };
+  document.body.appendChild(m);
+  previewWeeks();
+  updateSaveBtn();
+  document.getElementById("s-date").addEventListener("input", () => { previewWeeks(); updateSaveBtn(); });
+}
+
+function updateSaveBtn() {
+  const btn = document.getElementById("save-settings-btn");
+  const val = document.getElementById("s-date").value;
+  if (btn) { btn.disabled = !val; }
+}
+
+function previewWeeks() {
+  const d = document.getElementById("s-date").value;
+  const el = document.getElementById("week-preview");
+  if (!el) return;
+  if (!d) { el.innerHTML=""; return; }
+  el.innerHTML = `<div class="week-preview">
+    <div class="week-preview-header">Week Schedule Preview</div>
+    ${Array.from({length:TOTAL_WEEKS},(_,i)=>i+1).map(w=>`
+      <div class="week-preview-row">
+        <span style="font-size:12px;font-weight:700;color:#3b82f6">Week ${w}</span>
+        <span style="font-family:monospace;font-size:11px;color:#4a5e7a">${weekRange(d,w)}</span>
+      </div>`).join("")}
+  </div>`;
+}
+
+function saveSettings() {
+  const d = document.getElementById("s-date").value;
+  if (!d) return;
+  STATE.startDate = d;
+  STATE.projectName = document.getElementById("s-project").value || "Orbit Innovation Hub";
+  STATE.consultantName = document.getElementById("s-consultant").value || "Kasma Digitals";
+  activeWeek = guessWeek(d);
+  closeSettings();
+  showToast("✅ Settings saved");
+  render();
+}
+
+function closeSettings() {
+  const m = document.getElementById("settings-modal");
+  if (m) m.remove();
+}
+
+// ── ADD MODAL ─────────────────────────────────────────────────────────────────
+function openAddModal() {
+  const existing = document.getElementById("add-modal");
+  if (existing) existing.remove();
+  const m = document.createElement("div");
+  m.id = "add-modal";
+  m.className = "modal-bg";
+  m.innerHTML = `
+    <div class="modal" style="max-width:320px" onclick="event.stopPropagation()">
+      <div class="modal-title" style="margin-bottom:14px">Add Enterprise</div>
+      <input class="field-input" id="new-ent-name" placeholder="Enterprise name…"
+        onkeydown="if(event.key==='Enter')addEnterprise()"/>
+      <div style="display:flex;gap:8px">
+        <button class="save-btn" onclick="addEnterprise()">Add</button>
+        <button class="cancel-btn" style="margin-top:0" onclick="document.getElementById('add-modal').remove()">Cancel</button>
+      </div>
+    </div>
+  `;
+  m.onclick = () => m.remove();
+  document.body.appendChild(m);
+  setTimeout(()=>document.getElementById("new-ent-name").focus(), 50);
+}
+
+function addEnterprise() {
+  const inp = document.getElementById("new-ent-name");
+  if (!inp || !inp.value.trim()) return;
+  const name = inp.value.trim();
+  STATE.enterprises.push({id:`e${Date.now()}`, name});
+  document.getElementById("add-modal").remove();
+  showToast(`"${name}" added`);
+  render();
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────────
+function setView(v) { currentView=v; render(); }
+function setWeek(w) { activeWeek=w; render(); }
+function jumpToWeek(w) { activeWeek=w; currentView="tracker"; render(); }
+function setSearch(v) { search=v; render(); }
+function toggleIncomplete() { showIncomplete=!showIncomplete; render(); }
+function setPlatformFilter(p) { platformFilter=platformFilter===p?"all":p; render(); }
+
+function togglePost(eid, week, platform) {
+  const k = pk(eid, week, platform);
+  STATE.posts[k] = !STATE.posts[k];
+  render();
+}
+
+function markAll() {
+  getFiltered().forEach(e => PLATFORMS.forEach(pl => { STATE.posts[pk(e.id,activeWeek,pl)]=true; }));
+  showToast("✅ All visible enterprises marked as posted");
+  render();
+}
+
+function clearAll() {
+  getFiltered().forEach(e => PLATFORMS.forEach(pl => { STATE.posts[pk(e.id,activeWeek,pl)]=false; }));
+  showToast("Cleared statuses");
+  render();
+}
+
+function startEdit(id, name) { editingId=id; render(); }
+function cancelEdit() { editingId=null; render(); }
+
+function handleEditKey(e, id) {
+  if (e.key==="Enter") saveEdit(id);
+  if (e.key==="Escape") cancelEdit();
+}
+
+function saveEdit(id) {
+  const inp = document.getElementById("edit-input-"+id);
+  if (!inp || !inp.value.trim()) return;
+  STATE.enterprises = STATE.enterprises.map(e => e.id===id ? {...e,name:inp.value.trim()} : e);
+  editingId=null;
+  showToast("Name updated");
+  render();
+}
+
+function deleteEnt(id) {
+  STATE.enterprises = STATE.enterprises.filter(e => e.id!==id);
+  showToast("Enterprise removed");
+  render();
+}
+
+function exportCSV() {
+  const rows=[["Enterprise","Week","Date Range","TikTok","Facebook","Telegram","Posted","Remaining","Week %","Project %"]];
+  STATE.enterprises.forEach(e=>{
+    Array.from({length:TOTAL_WEEKS},(_,i)=>i+1).forEach(w=>{
+      const s=ewStats(e.id,w); const ts=eTotalStats(e.id);
+      rows.push([e.name,`Week ${w}`,weekRange(STATE.startDate,w)||`Week ${w}`,
+        getStatus(e.id,w,"tiktok")?"Yes":"No",getStatus(e.id,w,"facebook")?"Yes":"No",
+        getStatus(e.id,w,"telegram")?"Yes":"No",s.posted,s.remaining,`${s.pct}%`,`${ts.pct}%`]);
+    });
+  });
+  const csv=rows.map(r=>r.map(c=>`"${c}"`).join(",")).join("\n");
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download="orbit-kasma-tracker.csv"; a.click();
+  showToast("📊 CSV exported!");
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+if (STATE.startDate) activeWeek = guessWeek(STATE.startDate);
+render();
+if (!STATE.startDate) openSettings();
+</script>
+</body>
+</html>
